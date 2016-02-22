@@ -8,11 +8,10 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 
 	//$scope.conf_file =  drupalVariables.root + '/config/conf.json';
 	//$scope.conf_file =  drupalVariables.root + '/config?n=' + drupalVariables.nodeid;
-	$scope.conf_file =  drupalVariables.base + '/akconf/' + drupalVariables.nodeid;
+	$scope.conf_file =  drupalVariables.base + '/aklearnconf/' + drupalVariables.nodeid;
 	$scope.lang_path =  drupalVariables.root + '/config/lang/';
 
 	var mappings_file =  drupalVariables.root + '/config/facets_mappings.json';
-
 
 	//variable to show and hide elements in ui
 	$scope.show_hide = [];
@@ -20,12 +19,9 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 	$scope.show_hide[false]="show";
 
 	$rootScope.currentPage = 1;
-
-
 	/*-----------------------------------get properties from conf.json-----------------------------------*/
 	$http.get($scope.conf_file)
 	.success(function(data) {
-	/*console.log('here'); */
 	/*-----------------------------------FINDER SETTINGS FROM CONFIG FILE-----------------------------------*/
 		//$scope.limit_facets = data.limit_facets;
 		$scope.api_path = data.baseUrl;
@@ -39,7 +35,6 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 			$scope.enableLoadMore = data.enableLoadMore;
 		}
 
-
 		$scope.limitPagination = data.limitPagination;
 		$scope.pageSize = data.pageSize;
 		$scope.limit_facets = data.limit_facets;
@@ -50,7 +45,6 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 		$scope.maxTextLength = data.maxTextLength;
 		$scope.limit_facets_number = data.limit_facets_number;
 		$scope.findElements(true);
-
     })
 	.error(function(err){
 	//console.log(err);
@@ -85,7 +79,7 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 
 		//SNIPPETS
 		//Components inside snippet
-		$scope.snippetElements = ['title','description'];
+		$scope.snippetElements = ['title','abstract'];
 		$scope.maxTextLength = 500;
 
 	});
@@ -146,7 +140,6 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 	* @param facets_type {string} : defines what facets we want in every case
 	*/
 	$scope.init_finder = function(schema, facets_type) {
-
 		// When defining the facet_type we want to use, we also can limit everyone of these facets and define a specific mapping file for facets.
 		// For now we have 'training', 'educational', 'publications'.
 		// We can easily add more just by adding a new case in the following switch, and also add other options related to facets_type
@@ -154,25 +147,32 @@ listing.controller("mainController", function($rootScope, $scope, $http, $routeP
 			case 'educational' :
 				//$scope.facets = ['language','learningResourceTypes','contexts','endUserRoles']; /* 'set' */
 				//$scope.limit_facets = {"set":["oeellinogermaniki", "aglrmiksike", "edumnhn"]}; //"set":["aglrnedunhmc"]
-				mappings_file = drupalVariables.root + '/config/educational_facets_mappings.json';
+                                $scope.facets = ['language', 'controlled.type.value', 'controlled.classification.AGROVOC', 'format'];
+				mappings_file = drupalVariables.root + '/config/publications_facets_mappings.json';
+				break;
+			case 'publications' :
+				$scope.facets = ['language', 'controlled.type.value', 'controlled.classification.AGROVOC', 'format'];
+				//$scope.limit_facets = data.limit_facets;
+				mappings_file = drupalVariables.root + '/config/publications_facets_mappings.json';
 				break;
 			default:
-			    $scope.facets = ["set", "language", "contexts", 'learningResourceTypes'];
+			    $scope.facets = ['language', 'controlled.type.value', 'controlled.classification.AGROVOC', 'format'];
+			    mappings_file = drupalVariables.root + '/config/publications_facets_mappings.json';
 		}
 
 		// In every schema we define the specific elements we want to have in the snippets.
 		// Here can be added more schemas and also other options related to it.
 		switch(schema) {
 			case 'akif' :
-				$scope.snippetElements = [ "title", "description", "keywords" ]
+				$scope.snippetElements = [ "title", "abstract", "keywords" ]
 				break;
 			default:
-			    $scope.facets = ['set','language','contexts'];
+			    $scope.facets = ['set','language','keywords'];
 		}
 
 		//Check for selected schema. If nothing is selected we use as default the 'akif'.
 		if( schema!='akif' && schema!='agrif') {
-			$scope.schema = 'akif';
+			$scope.schema = 'agrif';
 		} else {
 			$scope.schema = schema;
 		}

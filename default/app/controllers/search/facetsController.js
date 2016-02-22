@@ -17,7 +17,7 @@ listing.controller("facetsController", function($rootScope, $scope, $routeParams
 */
 $scope.selectFacet = function(term, parent, count)
 {
-
+	console.log(parent);
 	var facet = {"term":term,"facet":parent,"count":count};
 
 	var flag = false;

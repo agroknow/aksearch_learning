@@ -6,7 +6,6 @@
 
 
  listing.controller("listingController", function($rootScope, $routeParams, $scope, $http, $location, sharedProperties){
-
 	/* variable to calculate the progress of http get request */
 	$scope.http_get_prog = 37;
 
@@ -45,12 +44,12 @@
 					//separate different terms of same facet
 					for(j in terms) {
 						var facet = { 'facet' : $scope.facets[i].toString() , 'term' : terms[j]} ;
-
+	
 						/*check if facet is already in active ones*/
 						var flag = false;
 						for(active in $scope.activeFacets){
 							if(facet.term == $scope.activeFacets[active].term){
-								flag=true
+								flag=true;
 							}
 						}
 						/*push item in active facets if it's not in array*/
@@ -86,11 +85,23 @@
 		    			//i.e to add 'vocational' in contexts we split it -> &contexts=| |education
 		    			var parts = query_active_facets.split($scope.activeFacets[facet].facet+'=');
 		    			//i.e add new facet+',' and connect -> &contexts=| vocational, |education -> &contexts=vocational,education
-		    			query_active_facets = parts[0]+$scope.activeFacets[facet].facet+'='+$scope.activeFacets[facet].term+'+AND+'+parts[1];
-		    		}
+					//if ($scope.activeFacets[facet].facet == "controlled.classification.AGROVOC") {
+                                        //       query_active_facets = parts[0]+$scope.activeFacets[facet].facet+'=<![CDATA['+$scope.activeFacets[facet].term+']]>+AND+'+parts[1];
+					//}
+					//else {
+				
+		    				query_active_facets = parts[0]+$scope.activeFacets[facet].facet+'='+$scope.activeFacets[facet].term+'+AND+'+parts[1];
+		    		
+					//}
+				}
 		    		//else we create a new parent
 		    		else{
-			    		query_active_facets +='&'+$scope.activeFacets[facet].facet+'='+$scope.activeFacets[facet].term;
+					//if ($scope.activeFacets[facet].facet == "controlled.classification.AGROVOC") {
+			    		//	query_active_facets +='&'+$scope.activeFacets[facet].facet+'=<![CDATA['+$scope.activeFacets[facet].term+']]>';
+					//}
+					//else {
+						query_active_facets +='&'+$scope.activeFacets[facet].facet+'='+$scope.activeFacets[facet].term;
+					//}
 		    		}
 		    	}
 			}
@@ -125,7 +136,9 @@
 		* limitFacets : '&set=oeintute&language=en,fr'
 		* limitFacetsNumber : '&limitFacetsNumber'
 		*/
-		var query = $scope.api_path + $scope.schema + '?' + $rootScope.query + query_facets + query_active_facets + query_pagination + limitFacets + limitFacetsNumber;
+		
+		var query = $scope.api_path + 'akif?' + $rootScope.query + query_facets + query_active_facets + query_pagination + limitFacets + limitFacetsNumber;
+//                var query = $scope.api_path + $scope.schema + '?' + $rootScope.query + query_facets + query_active_facets + query_pagination + limitFacets + limitFacetsNumber;
 
 
 		//add parameters to URL
@@ -150,14 +163,23 @@
 
 	//search() works with PAGINATION. SERVES CONTENT PER PAGE
 	$scope.search = function(query) {
-
+		console.log(query);
 		$http.get(query).success(function(data) {
-
+			console.log(data);
 			/*Add facets*/
 			if($scope.enableFacets) {
 				$scope.inactiveFacets.length = 0;/*clear results*/
-				$scope.inactiveFacets.push(data.facets);
+				/*for (var facet in data.facets) {
+                                        for (term in data.facets[facet].terms) {
+						data.facets[facet].terms[term].term = data.facets[facet].terms[term].term.replace("<![CDATA[", "").replace("]]>","");
+                                                if (data.facets[facet].terms[term].term == "cdata") {
+                                                        data.facets[facet].terms.splice(term,1);
+                                                }
+                                        }
+                                }*/
 
+				$scope.inactiveFacets.push(data.facets);
+				//console.log(data.facets);
 			}
 
 			/* 	variable to calculate http get progress. in combination with $scope.http_get_prog */
@@ -178,7 +200,7 @@
 			  });
 
 			sharedProperties.setTotal(data.total);
-		    $rootScope.updatePagination();
+		    $rootScope.updatePagination($scope.currentPage);
 			$scope.update();
 
 		})
@@ -197,12 +219,20 @@
 	$scope.searchMore = function(query) {
 
 		$http.get(query).success(function(data) {
-
+			console.log(data);
 			/*Add facets*/
 			if($scope.enableFacets) {
 				$scope.inactiveFacets.length = 0;/*clear results*/
+				/*for (var facet in data.facets) {
+					for (term in data.facets[facet].terms) {
+						data.facets[facet].terms[term].term = data.facets[facet].terms[term].term.replace("<![CDATA[", "").replace("]]>","");
+						if (data.facets[facet].terms[term].term == "cdata") {
+							data.facets[facet].terms.splice(term,1);
+						}
+					}
+				}*/
 				$scope.inactiveFacets.push(data.facets);
-
+				//console.log(data.facets);
 			}
 
 			//Print snippets
@@ -217,6 +247,7 @@
 
 			$scope.loading = false;
 			sharedProperties.setTotal(data.total);
+			$rootScope.updatePagination($scope.currentPage);
 			$scope.update();
 
 		})
@@ -277,7 +308,7 @@
 								keywords += "\""+thisJson.languageBlocks[$scope.selectedLanguage][snippet_elements[index]][i]+"\"";
 							}
 						}
-						equals += "\"" + snippet_elements[index] + "\" : [" + keywords + "]";
+						equals += "\"" + snippet_elements[index] + "\" : [" + keywords + "]"; 
 
 					}
 
@@ -330,15 +361,16 @@
 			}
 
 			//RIGHTS
-			if(thisJson.rights.url !== undefined) {
-				equals += '\ , "rights\" : \"' + thisJson.rights.url + '\"';
-			}
+			//if(thisJson.rights.url !== undefined) {
+			//	equals += '\ , "rights\" : \"' + thisJson.rights.url + '\"';
+			//}
 
 
 			temp = '{' + equals + '}';
 
 			//return every snippet as JSON
 			//console.log(temp);
+			//console.log(JSON.parse($scope.sanitize(temp)));
 			return JSON.parse($scope.sanitize(temp));
 		}
 		else

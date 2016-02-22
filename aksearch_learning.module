@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+function aksearch_learning_menu() {
+	$items['admin/config/aksearch_learning'] = array(
+			'title' => 'Agroknow Search configuration',
+			'description' => 'Specify options for Agroknow Learning Material Search  module.',
+			'position' => 'right',
+			'weight' => -5,
+			'page callback' => 'system_admin_menu_block_page',
+			'access arguments' => array('administer site configuration'),
+			'file' => 'system.admin.inc',
+			'file path' => drupal_get_path('module', 'system'),
+	);
+	$items['admin/config/aksearch_learning/settings'] = array(
+			'title' => 'Agroknow Learning Material Search settings',
+			'description' => 'Change how Agroknow Learning Material Search behaves.',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('aksearch_learning_admin_settings'),
+			'access arguments' => array('administer site configuration'),
+			'type' => MENU_NORMAL_ITEM,
+			'file' => 'aksearch_learning.admin.inc',
+	);
+	$items['aklearnconf'] = array(
+			'page callback' => 'aklearnnode_config',
+			'page arguments' => array(1),
+			'access callback' => TRUE,
+			'type' => MENU_CALLBACK,
+	);
+	return $items;
+}
+
+/**
+ * Menu callback for aksearch_learning node configuration
+ */
+function aklearnnode_config($n){
+	$result = db_query('SELECT conf FROM {aksearch_learning_conf} WHERE nid = :nid LIMIT 1', array(':nid' => $n));
+	echo $result->fetchField();
+	drupal_exit();
+}
+
+/**
+* Implements hook_node_info()
+*/
+function aksearch_learning_node_info() {
+return array(
+	'aksearch_learning' => array(
+	'name' => t('Agroknow Learning Material Search'),
+	'base' => 'aksearch_learning',
+	'description' => t('Use this content type to create a Agroknow Learning Material Search page.'),
+	'has_title' => TRUE,
+	'title_label' => t('Title'),
+	'help' => t('Enter the title'),
+	),
+);
+}
+
+/**
+* Implements hook_form()
+*/
+function aksearch_learning_form($node, $form_state) {
+return node_content_form($node, $form_state);
+}
+
+/**
+ * Implements hook_insert()
+ */
+function aksearch_learning_insert($node){
+
+$cf = file_get_contents(drupal_get_path('module','aksearch_learning').'/default/config/conf.json');
+$r = db_insert('aksearch_learning_conf')
+->fields(array(
+'nid' => $node->nid,
+'conf' => $cf,
+))
+->execute();
+	
+	
+}
+
+/**
+* Implements hook_view()
+*/
+function aksearch_learning_view($node){
+	$issearch = $node->nid == variable_get('aksearch_learning_spage',0) ? true : false ;
+
+		$node->content['body'] = array(
+			'#markup' => theme('aksearch_learning', 
+				array('cont'=> $node->body,'search' => $issearch , 'nif' => $node->nid)
+			),
+			'#weight' => 1,
+			);
+	return $node;
+
+}
+
+/**
+* Implements hook_theme()
+*/
+function aksearch_learning_theme() {
+return array(
+    'aksearch_learning' => array(
+      'variables' => array('cont'=> '','search' => true , 'nif' => 0),
+      'template' => 'aksearch_learning',
+    ),
+	);
+}

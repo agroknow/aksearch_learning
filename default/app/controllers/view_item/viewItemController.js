@@ -39,12 +39,13 @@ listing.controller("viewItemController", function($rootScope, $scope, $http, $lo
 
 	/************************************************** GET ITEM *****************************/
 	$rootScope.getItem = function() {
-
+		
 		var item_identifier = $routeParams.itemId.split('_')[0]; //SET_ID
 		var item_set = $routeParams.itemId.split('_')[1];
 
 		var headers = {'Content-Type':'application/json','Accept':'application/json;charset=utf-8'};
-
+		console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+		console.log($scope.akif + item_set + '/' + item_identifier);
 		$http({
 			method : 'GET',
 			url : $scope.akif + item_set + '/' + item_identifier, //..akif/ILUMINA/18169

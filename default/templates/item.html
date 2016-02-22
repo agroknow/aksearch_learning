@@ -6,9 +6,6 @@
 <hr>
 
 <div id="view_item" ng-controller="viewItemController" ng-init="getItem()" class="col-xs-12 col-sm-12 col-md-12">
-    <form ng-submit="submit()" class="form-wrapper cf">  <!-- IN CASE WE NEED TO SEPARATE THE TYPE OF SEARCH i.e educational ng-submit="submit('educational')" -->
-        <input ng-model="search_query" name="search_query" type="text" placeholder="{{languages.search_here}}..."> <button type="submit">{{languages.search}}</button>
-    </form>
 
     <article id="main_content" class="col-xs-12 col-sm-12 col-md-12 ">
         <h3 id="itemTitle"><a href="{{item_resource_url}}" target="_blank">{{item_title}}</a></h3>

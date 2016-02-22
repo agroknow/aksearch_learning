@@ -1,0 +1,11 @@
+name = Agroknow Learning Material Search
+description = "Search on Agroknow indices containing Learning Material"
+package = Agro Know
+core = 7.x
+dependencies[] = jquery_update
+files[] = aksearch_learning.install
+files[] = aksearch_learning.module
+files[] = aksearch_learning.js
+files[] = aksearch_learning.css
+files[] = aksearch_learning.admin.inc
+configure=admin/config/aksearch_learning/settings

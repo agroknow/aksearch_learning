@@ -53,12 +53,12 @@ listing.config(['$routeProvider',
 			}).
 			//view-item
 			when('/item', {
-				templateUrl: drupalVariables.root + '/templates/item.html',
-				controller: 'viewItemController'
+				templateUrl: drupalVariables.root + '/templates/agrif_item.html',
+				controller: 'agris-viewItemController'
 			}).
 			when('/item/:itemId', {
-				templateUrl: drupalVariables.root + '/templates/item.html',
-				controller: 'viewItemController'
+				templateUrl: drupalVariables.root + '/templates/agrif_item.html',
+				controller: 'agris-viewItemController'
 			}).
 			//general
 			when('/', {
@@ -70,4 +70,5 @@ listing.config(['$routeProvider',
 				redirectTo: '/'
 			});
 	}]);
+
 

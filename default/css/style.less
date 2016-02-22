@@ -48,7 +48,14 @@
 /*				GENERAL & LANDING PAGE 				  */
 /******************************************************/
 
+#search_input {
+	background-color:#eee;
+	font-size:15px;
+}
 
+.item_details li{
+	margin-bottom:20px;
+}
 
 #akListing {
 
@@ -425,7 +432,7 @@
 	width:100%;
 	padding-bottom: 5px;
 	margin-top: 10px;
-	border-top: 1px solid @black_01;
+	/*border-top: 1px solid @black_01;*/
 
 	a {
 		padding:1px 3px;
@@ -449,6 +456,11 @@
 
 }
 
+.panel-collapse.collapse.in {
+	overflow-y: hidden !important;
+	max-height:1000px !important; 
+}
+
 /******************************************************/
 /*					FACETS	(drop-down-mobile)		  */
 /******************************************************/
@@ -456,6 +468,10 @@
 	background-color: @dropdown_background;
 	max-height: 280px;
 	overflow-x: scroll;
+}
+
+.accordion-toggle {
+	cursor:pointer;
 }
 
 
@@ -550,7 +566,7 @@
 	color:black;
 	a {
 		text-decoration: none;
-		color: @color_1;
+		color: @color_1 ;
 		font-weight: bold;
 
 		&:hover {
